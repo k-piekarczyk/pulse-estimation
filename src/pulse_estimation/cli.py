@@ -11,10 +11,10 @@ from pulse_estimation.utils.signal import butter_bandpass_filter
 from pulse_estimation.core import extract_face_frames, get_mean_pixel_values, threshold_pixel_values
 
 face_cascade_file = "./resources/haar/haarcascade_frontalface_default.xml"
-# target_video_file = "./resources/video/my/face_webcam_uncontrolled.mp4"
-# target_video_file = "./resources/video/my/face_controlled_not_diffused.mov"
-target_video_file = "./resources/video/my/face_controlled_diffused.mov"
-# target_video_file = "./resources/video/other/face.mp4"
+target_video_file = "./resources/video/my/face_webcam_uncontrolled.mp4"  # Naiwna metoda wyboru komponentu NIE działa
+# target_video_file = "./resources/video/my/face_controlled_not_diffused.mov" # Naiwna metoda wyboru komponentu NIE działa
+# target_video_file = "./resources/video/my/face_controlled_diffused.mov" # Naiwna metoda wyboru komponentu działa
+# target_video_file = "./resources/video/other/face.mp4"  # Naiwna metoda wyboru komponentu działa
 
 min_YCrCb = np.array([0, 133, 77], np.uint8)
 max_YCrCb = np.array([235, 173, 127], np.uint8)
@@ -41,7 +41,7 @@ def main():
 
     frequencies = rfftfreq(N, T)
 
-    fig, axs = plt.subplots(3, 4)
+    fig, axs = plt.subplots(3, 4, constrained_layout=True)
 
     axs[0, 0].set_title("1st channel")
     axs[0, 0].plot(mean_values[:, 0], "-b")
@@ -92,6 +92,21 @@ def main():
 
     axs[2, 3].set_title("3rd component FFT | max: [%.4f Hz - %.2f bpm]" % (max_freq_comp_3, max_freq_comp_3 * 60))
     axs[2, 3].plot(frequencies, ica_fft_comp_3)
+
+    comp_1_magnitude_ratio = np.partition(ica_fft_comp_1.flatten(), -2)[-2] / np.max(ica_fft_comp_1)
+    comp_2_magnitude_ratio = np.partition(ica_fft_comp_2.flatten(), -2)[-2] / np.max(ica_fft_comp_2)
+    comp_3_magnitude_ratio = np.partition(ica_fft_comp_3.flatten(), -2)[-2] / np.max(ica_fft_comp_3)
+
+    estimated_heart_rate = 0.0
+    if comp_1_magnitude_ratio < comp_2_magnitude_ratio and comp_1_magnitude_ratio < comp_3_magnitude_ratio:
+        estimated_heart_rate = max_freq_comp_1 * 60
+    elif comp_2_magnitude_ratio < comp_3_magnitude_ratio:
+        estimated_heart_rate = max_freq_comp_2 * 60
+    else:
+        estimated_heart_rate = max_freq_comp_3 * 60
+    
+    print("Estimated heart rate is %.2f" % (estimated_heart_rate))
+    fig.suptitle("Estimated heart rate is %.2f" % (estimated_heart_rate))
 
     plt.show()
 
