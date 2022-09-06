@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from typing import Optional
-from sklearn.decomposition import FastICA
+from sklearn.decomposition import FastICA, PCA
 from scipy.fft import rfft, rfftfreq
 
 from pulse_estimation.utils.video import FileVideoSource
@@ -11,10 +11,10 @@ from pulse_estimation.utils.signal import butter_bandpass_filter
 from pulse_estimation.core import extract_face_frames, get_mean_pixel_values, threshold_pixel_values
 
 face_cascade_file = "./resources/haar/haarcascade_frontalface_default.xml"
-target_video_file = "./resources/video/my/face_webcam_uncontrolled.mp4"  # Naiwna metoda wyboru komponentu NIE działa
+# target_video_file = "./resources/video/my/face_webcam_uncontrolled.mp4"  # Naiwna metoda wyboru komponentu NIE działa
 # target_video_file = "./resources/video/my/face_controlled_not_diffused.mov" # Naiwna metoda wyboru komponentu NIE działa
 # target_video_file = "./resources/video/my/face_controlled_diffused.mov" # Naiwna metoda wyboru komponentu działa
-# target_video_file = "./resources/video/other/face.mp4"  # Naiwna metoda wyboru komponentu działa
+target_video_file = "./resources/video/other/face.mp4"  # Naiwna metoda wyboru komponentu działa
 
 min_YCrCb = np.array([0, 133, 77], np.uint8)
 max_YCrCb = np.array([235, 173, 127], np.uint8)
@@ -33,6 +33,7 @@ def main():
     mean_values = get_mean_pixel_values(skin_pixels, omit_zeros=True)
 
     transformer = FastICA(n_components=3)
+    # transformer = PCA(n_components=3)
 
     ica = transformer.fit_transform(mean_values)
 
