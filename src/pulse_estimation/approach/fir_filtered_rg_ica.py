@@ -12,10 +12,10 @@ from pulse_estimation.utils.signal import butter_bandpass_filter, fir_bandpass_f
 from pulse_estimation.core import extract_face_frames, get_mean_pixel_values, threshold_pixel_values
 
 
-__all__ = ["naive_ICA_filter_channel"]
+__all__ = ["fir_filtered_RG_ICA"]
 
 
-def naive_ICA_filter_channel(
+def fir_filtered_RG_ICA(
     target_video_file: str,
     face_cascade_file: str,
     hr_low: float,
@@ -26,6 +26,13 @@ def naive_ICA_filter_channel(
     display_face_selection: bool = False,
     plot: bool = False,
 ) -> float:
+    """
+    This method consist of the following steps:
+
+    1. Filter the channels with a FIR bandpass filter
+    2. Run a 2 component ICA on the red and green channel (when there is less blood under the skin, it has a more pale, yellowy hue, and yellow is mainly a mix of red and green)
+    3. Select the frequency with the highest magnitude
+    """
     video_source = FileVideoSource(filepath=target_video_file)
 
     _, _, _, fps = video_source.get_stats()
