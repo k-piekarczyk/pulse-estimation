@@ -49,11 +49,11 @@ def extract_face_frames(vid: FileVideoSource, face_cascade_path: str, display: b
                 break
         else:
             break
-    
+
     if display:
         cap.release()
         cv2.destroyAllWindows()
-    
+
     if len(face_frames) == 0:
         raise NoFaceDetected()
 

@@ -13,6 +13,7 @@ from pulse_estimation.core import extract_face_frames, get_mean_pixel_values, th
 
 __all__ = ["naive_PCA"]
 
+
 def naive_PCA(
     target_video_file: str,
     face_cascade_file: str,
@@ -20,13 +21,19 @@ def naive_PCA(
     hr_high: float,
     skin_min_threshold: npt.NDArray,
     skin_max_threshold: npt.NDArray,
+    display: bool = False,
 ):
     video_source = FileVideoSource(filepath=target_video_file)
 
     _, _, _, fps = video_source.get_stats()
 
-    face_frames = extract_face_frames(vid=video_source, face_cascade_path=face_cascade_file, display=True)
-    skin_pixels = threshold_pixel_values(frames=face_frames, min_val=skin_min_threshold, max_val=skin_max_threshold, threshold_color_space_change=cv2.COLOR_BGR2YCrCb)
+    face_frames = extract_face_frames(vid=video_source, face_cascade_path=face_cascade_file, display=display)
+    skin_pixels = threshold_pixel_values(
+        frames=face_frames,
+        min_val=skin_min_threshold,
+        max_val=skin_max_threshold,
+        threshold_color_space_change=cv2.COLOR_BGR2YCrCb,
+    )
     mean_values = get_mean_pixel_values(skin_pixels, omit_zeros=True)
 
     transformer = PCA(n_components=3)
@@ -58,11 +65,10 @@ def naive_PCA(
     axs[2, 1].set_title("3rd component")
     axs[2, 1].plot(pca[:, 2])
 
-
     pca_comp_1_filt = butter_bandpass_filter(data=pca[:, 0], lowcut=hr_low, highcut=hr_high, sampling_rate=fps, order=5)
     pca_comp_2_filt = butter_bandpass_filter(data=pca[:, 1], lowcut=hr_low, highcut=hr_high, sampling_rate=fps, order=5)
     pca_comp_3_filt = butter_bandpass_filter(data=pca[:, 2], lowcut=hr_low, highcut=hr_high, sampling_rate=fps, order=5)
-    
+
     axs[0, 2].set_title("1st component - filtered")
     axs[0, 2].plot(pca_comp_1_filt)
 
@@ -72,7 +78,6 @@ def naive_PCA(
     axs[2, 2].set_title("3rd component - filtered")
     axs[2, 2].plot(pca_comp_3_filt)
 
-    
     pca_fft_comp_1 = np.abs(rfft(pca_comp_1_filt))
     pca_fft_comp_2 = np.abs(rfft(pca_comp_2_filt))
     pca_fft_comp_3 = np.abs(rfft(pca_comp_3_filt))
@@ -101,7 +106,7 @@ def naive_PCA(
         estimated_heart_rate = max_freq_comp_2 * 60
     else:
         estimated_heart_rate = max_freq_comp_3 * 60
-    
+
     print("Estimated heart rate is %.2f" % (estimated_heart_rate))
     fig.suptitle("Estimated heart rate is %.2f" % (estimated_heart_rate))
 
