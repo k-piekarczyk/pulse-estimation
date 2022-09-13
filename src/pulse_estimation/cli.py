@@ -10,11 +10,11 @@ face_cascade_file = "./resources/haar/haarcascade_frontalface_alt.xml"
 
 
 selection = [
-    {"video": "./resources/video/my/face_webcam_uncontrolled.mp4", "heart_rate": 80 / 60.0},
-    {"video": "./resources/video/my/face_controlled_not_diffused.mov", "heart_rate": 68.5 / 60.0},
-    {"video": "./resources/video/my/face_controlled_diffused.mov", "heart_rate": 83.5 / 60.0},
-    {"video": "./resources/video/my/face_outdoors_90bpm.mp4", "heart_rate": 90 / 60.0},
-    {"video": "./resources/video/other/face.mp4", "heart_rate": 54.0 / 60.0},
+    {"video": "./resources/video/my/face_webcam_uncontrolled.mp4", "heart_rate": 80 / 60.0},  # 0
+    {"video": "./resources/video/my/face_controlled_not_diffused.mov", "heart_rate": 68.5 / 60.0},  # 1 
+    {"video": "./resources/video/my/face_controlled_diffused.mov", "heart_rate": 83.5 / 60.0},  # 2
+    {"video": "./resources/video/my/face_outdoors_90bpm.mp4", "heart_rate": 90 / 60.0},  # 3
+    {"video": "./resources/video/other/face.mp4", "heart_rate": 54.0 / 60.0},  # 4
 ]
 
 min_YCrCb = np.array([0, 133, 77], np.uint8)
@@ -63,11 +63,11 @@ def all_targets_PCA():
 
 
 def single_target():
-    target = 1
-    method=fir_filtered_RG_ICA
+    target = 4
+    method = fir_filtered_RG_ICA
     # method = fir_filtered_RG_PCA
     args = (face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb)
-    kwargs = {"display_face_selection": False, "plot": False}
+    kwargs = {"display_face_selection": True, "plot": True}
 
     target_video = selection[target]["video"]
     target_heart_rate = selection[target].get("heart_rate", None)
