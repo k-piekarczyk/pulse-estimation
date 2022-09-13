@@ -38,5 +38,6 @@ target-version = ["py38"]
 
 [tool.poetry.scripts]
 all_targets_ICA = "src.pulse_estimation.cli:all_targets_ICA"
+all_targets_HSV_ICA = "src.pulse_estimation.cli:all_targets_HSV_ICA"
 all_targets_PCA = "src.pulse_estimation.cli:all_targets_PCA"
 single_target = "src.pulse_estimation.cli:single_target"

@@ -3,7 +3,7 @@ import pandas as pd
 
 from typing import Any, Optional, Callable
 
-from pulse_estimation.approach import naive_ICA, naive_PCA, fir_filtered_RG_ICA, fir_filtered_RG_PCA
+from pulse_estimation.approach import naive_ICA, naive_PCA, fir_filtered_RG_ICA, fir_filtered_RG_PCA, fir_filtered_HSV_ICA
 
 # face_cascade_file = "./resources/haar/haarcascade_frontalface_default.xml"
 face_cascade_file = "./resources/haar/haarcascade_frontalface_alt.xml"
@@ -61,10 +61,18 @@ def all_targets_PCA():
         kwargs={"display_face_selection": False, "plot": False},
     )
 
+def all_targets_HSV_ICA():
+    run_for_every_target(
+        method=fir_filtered_HSV_ICA,
+        args=(face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb),
+        kwargs={"display_face_selection": False, "plot": False},
+    )
+
 
 def single_target():
-    target = 4
-    method = fir_filtered_RG_ICA
+    target = 0
+    method = fir_filtered_HSV_ICA
+    # method = fir_filtered_RG_ICA
     # method = fir_filtered_RG_PCA
     args = (face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb)
     kwargs = {"display_face_selection": True, "plot": True}
