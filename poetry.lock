@@ -217,6 +217,26 @@ python-versions = ">=3.6"
 pyparsing = ">=2.0.2,<3.0.5 || >3.0.5"
 
 [[package]]
+name = "pandas"
+version = "1.4.4"
+description = "Powerful data structures for data analysis, time series, and statistics"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
+numpy = [
+    {version = ">=1.18.5", markers = "platform_machine != \"aarch64\" and platform_machine != \"arm64\" and python_version < \"3.10\""},
+    {version = ">=1.19.2", markers = "platform_machine == \"aarch64\" and python_version < \"3.10\""},
+    {version = ">=1.20.0", markers = "platform_machine == \"arm64\" and python_version < \"3.10\""},
+]
+python-dateutil = ">=2.8.1"
+pytz = ">=2020.1"
+
+[package.extras]
+test = ["hypothesis (>=5.5.3)", "pytest (>=6.0)", "pytest-xdist (>=1.31)"]
+
+[[package]]
 name = "pathspec"
 version = "0.9.0"
 description = "Utility library for gitignore style pattern matching of file paths."
@@ -328,6 +348,14 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 six = ">=1.5"
 
 [[package]]
+name = "pytz"
+version = "2022.2.1"
+description = "World timezone definitions, modern and historical"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "scikit-learn"
 version = "1.1.2"
 description = "A set of python modules for machine learning and data mining"
@@ -417,7 +445,7 @@ python-versions = ">=3.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.8"
-content-hash = "38673f552b129744b183fb00471cf6f9eb13ee531d9d4709ddd019ce96679188"
+content-hash = "8f55d73188380bc0e34ad3280d74d23883613c01974a1035490321ef0cd99daf"
 
 [metadata.files]
 atomicwrites = []
@@ -438,6 +466,7 @@ mypy-extensions = []
 numpy = []
 opencv-python = []
 packaging = []
+pandas = []
 pathspec = []
 pillow = []
 platformdirs = []
@@ -448,6 +477,7 @@ pyflakes = []
 pyparsing = []
 pytest = []
 python-dateutil = []
+pytz = []
 scikit-learn = []
 scipy = []
 setuptools-scm = []

@@ -108,7 +108,7 @@ def fir_filtered_RG_PCA(
 
         # Signal
         fig_signal, axs_signal = plt.subplots(3, 4, constrained_layout=True)
-        fig_signal.suptitle(f"Signal plots for: {target_video_file}")
+        fig_signal.suptitle(f"PCA: Signal plots for: {target_video_file}")
         fig_signal.legend(lines, labels)
 
         for i in range(3):
@@ -137,7 +137,7 @@ def fir_filtered_RG_PCA(
 
         # Components
         fig_components, axs_components = plt.subplots(2, 2, constrained_layout=True)
-        fig_components.suptitle(f"Components plots for: {target_video_file}")
+        fig_components.suptitle(f"PCA: Components plots for: {target_video_file}")
         fig_components.legend(lines, labels)
 
         for i in range(2):

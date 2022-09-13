@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from typing import Any, Optional, Callable
 
@@ -22,6 +23,8 @@ max_YCrCb = np.array([235, 173, 127], np.uint8)
 hr_low = 0.5
 hr_high = 3
 
+# naive_ICA(target[0], face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb, acc_hr=target[1])
+# naive_PCA(target[0], face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb)
 
 def run_for_every_target(method: Callable[..., Optional[float]], args: tuple, kwargs: dict):
     for target in range(len(selection)):
@@ -44,19 +47,25 @@ def run_for_every_target(method: Callable[..., Optional[float]], args: tuple, kw
             print("")
 
 
-def gauntlet():
+def all_targets_ICA():
     run_for_every_target(
-        # method=fir_filtered_RG_ICA,
+        method=fir_filtered_RG_ICA,
+        args=(face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb),
+        kwargs={"display_face_selection": False, "plot": False},
+    )
+
+def all_targets_PCA():
+    run_for_every_target(
         method=fir_filtered_RG_PCA,
         args=(face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb),
         kwargs={"display_face_selection": False, "plot": False},
     )
 
 
-def single():
+def single_target():
     target = 1
-    # method=fir_filtered_RG_ICA
-    method = fir_filtered_RG_PCA
+    method=fir_filtered_RG_ICA
+    # method = fir_filtered_RG_PCA
     args = (face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb)
     kwargs = {"display_face_selection": False, "plot": False}
 
@@ -64,7 +73,7 @@ def single():
     target_heart_rate = selection[target].get("heart_rate", None)
 
     print(f"Current target video: {target_video}")
-
+    
     result = method(*(target_video, *args), **{"acc_hr": target_heart_rate, **kwargs})
 
     if result is not None and target_heart_rate is not None:
@@ -79,5 +88,32 @@ def single():
         print("")
 
 
-# naive_ICA(target[0], face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb, acc_hr=target[1])
-# naive_PCA(target[0], face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb)
+def benchmark_single_target():
+    iterations = 5
+    target = 1
+    # method=fir_filtered_RG_ICA
+    method = fir_filtered_RG_PCA
+    print(method)
+    args = (face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb)
+    kwargs = {"display_face_selection": False, "plot": False}
+
+    target_video = selection[target]["video"]
+    target_heart_rate = selection[target].get("heart_rate", None)
+
+    print(f"Current target video: {target_video}")
+
+    results = []
+    for _ in range(iterations):
+        result = method(*(target_video, *args), **{"acc_hr": target_heart_rate, **kwargs})
+
+        if result is not None and target_heart_rate is not None:
+            target_hr = target_heart_rate * 60
+            result_hr = result * 60
+
+            absolute_error = abs(result_hr - target_hr)
+            relative_error = (absolute_error / target_hr) * 100
+        
+        results.append(pd.Series({"est_hr": result_hr, "abs_err": absolute_error, "rel_err": relative_error}))
+    print(pd.DataFrame(results))
+    
+    

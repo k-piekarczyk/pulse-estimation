@@ -12,6 +12,7 @@ scipy = "^1.9.0"
 opencv-python = "^4.6.0"
 toml = "^0.10.2"
 scikit-learn = "^1.1.2"
+pandas = "^1.4.4"
 
 
 [tool.poetry.dev-dependencies]
@@ -36,5 +37,6 @@ line-length = 120
 target-version = ["py38"]
 
 [tool.poetry.scripts]
-gauntlet = "src.pulse_estimation.cli:gauntlet"
-single = "src.pulse_estimation.cli:single"
+all_targets_ICA = "src.pulse_estimation.cli:all_targets_ICA"
+all_targets_PCA = "src.pulse_estimation.cli:all_targets_PCA"
+single_target = "src.pulse_estimation.cli:single_target"
