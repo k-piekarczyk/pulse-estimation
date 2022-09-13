@@ -79,9 +79,9 @@ def all_targets_HSV_ICA():
 
 
 def single_target():
-    target = 2
-    method = fir_filtered_HSV_ICA
-    # method = fir_filtered_RG_ICA
+    target = 4
+    # method = fir_filtered_HSV_ICA
+    method = fir_filtered_RG_ICA
     # method = fir_filtered_RG_PCA
     args = (face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb)
     kwargs = {"display_face_selection": True, "plot": True}
