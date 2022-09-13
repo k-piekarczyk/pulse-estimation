@@ -36,4 +36,5 @@ line-length = 120
 target-version = ["py38"]
 
 [tool.poetry.scripts]
-cli = "src.pulse_estimation.cli:main"
+gauntlet = "src.pulse_estimation.cli:gauntlet"
+single = "src.pulse_estimation.cli:single"
