@@ -79,7 +79,7 @@ def all_targets_HSV_ICA():
 
 
 def single_target():
-    target = 0
+    target = 2
     method = fir_filtered_HSV_ICA
     # method = fir_filtered_RG_ICA
     # method = fir_filtered_RG_PCA

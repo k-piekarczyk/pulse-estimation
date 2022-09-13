@@ -77,23 +77,29 @@ def fir_filtered_HSV_ICA(
     """
     ICA
     """
-    transformer = FastICA(n_components=3, whiten="unit-variance", max_iter=1000)
-    ica = transformer.fit_transform(np.swapaxes(np.array(filtered), 0, 1))
+    n_comp = 2
+    transformer = FastICA(n_components=n_comp, whiten="unit-variance", max_iter=1000)
+    ica = transformer.fit_transform(np.swapaxes(np.array(filtered)[0:2], 0, 1))
 
     ica_freqs = rfftfreq(ica.shape[0], T)
 
-    ica_mags = [np.abs(rfft(ica[:, i])) for i in range(3)]
+    ica_mags = [np.abs(rfft(ica[:, i])) for i in range(n_comp)]
 
-    for i in range(3):
+    for i in range(n_comp):
         ica_mags[i][0] = 0
 
     selected_component = 0
-    if np.max(ica_mags[0]) > np.max(ica_mags[1]) and np.max(ica_mags[0]) > np.max(ica_mags[2]):
-        selected_component = 0
-    elif np.max(ica_mags[1]) > np.max(ica_mags[2]):
-        selected_component = 1
+    if n_comp == 2:
+        selected_component = 0 if np.max(ica_mags[0]) > np.max(ica_mags[1]) else 1
+    elif n_comp == 3:
+        if np.max(ica_mags[0]) > np.max(ica_mags[1]) and np.max(ica_mags[0]) > np.max(ica_mags[2]):
+            selected_component = 0
+        elif np.max(ica_mags[1]) > np.max(ica_mags[2]):
+            selected_component = 1
+        else:
+            selected_component = 2
     else:
-        selected_component = 2
+        raise Exception(f"Selected number of components ({n_comp} is not implemented.")
 
     result = ica_freqs[np.argmax(ica_mags[selected_component])]
 
@@ -137,11 +143,11 @@ def fir_filtered_HSV_ICA(
             axs_signal[i, 3].axvline(x=result, color="magenta", linestyle="solid")
 
         # Components
-        fig_components, axs_components = plt.subplots(3, 2, constrained_layout=True)
+        fig_components, axs_components = plt.subplots(n_comp, 2, constrained_layout=True)
         fig_components.suptitle(f"ICA: Components plots for: {target_video_file}")
         fig_components.legend(lines, labels)
 
-        for i in range(3):
+        for i in range(n_comp):
             title = f"Component {i + 1}"
             if i == selected_component:
                 title += " - Selected"
@@ -149,7 +155,7 @@ def fir_filtered_HSV_ICA(
             axs_components[i, 0].set_title(title)
             axs_components[i, 0].plot(ica[:, i])
 
-        for i in range(3):
+        for i in range(n_comp):
             title = f"Component {i + 1} FT"
             if i == selected_component:
                 title += " - Selected"
