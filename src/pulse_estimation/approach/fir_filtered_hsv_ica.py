@@ -27,8 +27,7 @@ def fir_filtered_HSV_ICA(
     display_face_selection: bool = False,
     plot: bool = False,
 ) -> float:
-    """
-    """
+    """ """
     video_source = FileVideoSource(filepath=target_video_file)
 
     _, _, _, fps = video_source.get_stats()
