@@ -1,11 +1,9 @@
 import numpy as np
 import pandas as pd
 
-from typing import Any, Optional, Callable
+from typing import Optional, Callable
 
 from pulse_estimation.approach import (
-    naive_ICA,
-    naive_PCA,
     fir_filtered_ICA,
     fir_filtered_PCA,
     fir_filtered_HSV_ICA,
@@ -58,7 +56,7 @@ def all_targets_ICA():
     run_for_every_target(
         method=fir_filtered_ICA,
         args=(face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb),
-        kwargs={"display_face_selection": False, "plot": True},
+        kwargs={"display_face_selection": False, "plot": False},
     )
 
 
@@ -66,7 +64,7 @@ def all_targets_PCA():
     run_for_every_target(
         method=fir_filtered_PCA,
         args=(face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb),
-        kwargs={"display_face_selection": False, "plot": True},
+        kwargs={"display_face_selection": False, "plot": False},
     )
 
 

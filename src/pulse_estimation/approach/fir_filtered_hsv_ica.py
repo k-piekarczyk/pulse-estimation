@@ -9,7 +9,7 @@ from scipy.fft import rfft, rfftfreq
 from sklearn.decomposition import FastICA
 
 from pulse_estimation.utils.video import FileVideoSource
-from pulse_estimation.utils.signal import butter_bandpass_filter, fir_bandpass_filter
+from pulse_estimation.utils.signal import fir_bandpass_filter
 from pulse_estimation.core import extract_face_frames, get_mean_pixel_values, threshold_pixel_values
 
 
@@ -77,9 +77,9 @@ def fir_filtered_HSV_ICA(
     """
     ICA
     """
-    n_comp = 2
+    n_comp = 3
     transformer = FastICA(n_components=n_comp, whiten="unit-variance", max_iter=1000)
-    ica = transformer.fit_transform(np.swapaxes(np.array(filtered)[0:2], 0, 1))
+    ica = transformer.fit_transform(np.swapaxes(np.array(filtered), 0, 1))
 
     ica_freqs = rfftfreq(ica.shape[0], T)
 
