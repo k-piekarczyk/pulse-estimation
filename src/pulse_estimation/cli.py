@@ -6,8 +6,8 @@ from typing import Any, Optional, Callable
 from pulse_estimation.approach import (
     naive_ICA,
     naive_PCA,
-    fir_filtered_RG_ICA,
-    fir_filtered_RG_PCA,
+    fir_filtered_ICA,
+    fir_filtered_PCA,
     fir_filtered_HSV_ICA,
 )
 
@@ -56,17 +56,17 @@ def run_for_every_target(method: Callable[..., Optional[float]], args: tuple, kw
 
 def all_targets_ICA():
     run_for_every_target(
-        method=fir_filtered_RG_ICA,
+        method=fir_filtered_ICA,
         args=(face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb),
-        kwargs={"display_face_selection": False, "plot": False},
+        kwargs={"display_face_selection": False, "plot": True},
     )
 
 
 def all_targets_PCA():
     run_for_every_target(
-        method=fir_filtered_RG_PCA,
+        method=fir_filtered_PCA,
         args=(face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb),
-        kwargs={"display_face_selection": False, "plot": False},
+        kwargs={"display_face_selection": False, "plot": True},
     )
 
 
@@ -81,7 +81,7 @@ def all_targets_HSV_ICA():
 def single_target():
     target = 4
     # method = fir_filtered_HSV_ICA
-    method = fir_filtered_RG_ICA
+    method = fir_filtered_ICA
     # method = fir_filtered_RG_PCA
     args = (face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb)
     kwargs = {"display_face_selection": True, "plot": True}
@@ -109,7 +109,7 @@ def benchmark_single_target():
     iterations = 5
     target = 1
     # method=fir_filtered_RG_ICA
-    method = fir_filtered_RG_PCA
+    method = fir_filtered_PCA
     print(method)
     args = (face_cascade_file, hr_low, hr_high, min_YCrCb, max_YCrCb)
     kwargs = {"display_face_selection": False, "plot": False}

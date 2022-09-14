@@ -6,17 +6,17 @@ import matplotlib.pyplot as plt
 from typing import Optional
 from matplotlib.lines import Line2D
 from scipy.fft import rfft, rfftfreq
-from sklearn.decomposition import FastICA
+from sklearn.decomposition import PCA
 
 from pulse_estimation.utils.video import FileVideoSource
 from pulse_estimation.utils.signal import butter_bandpass_filter, fir_bandpass_filter
 from pulse_estimation.core import extract_face_frames, get_mean_pixel_values, threshold_pixel_values
 
 
-__all__ = ["fir_filtered_RG_ICA"]
+__all__ = ["fir_filtered_PCA"]
 
 
-def fir_filtered_RG_ICA(
+def fir_filtered_PCA(
     target_video_file: str,
     face_cascade_file: str,
     hr_low: float,
@@ -31,7 +31,7 @@ def fir_filtered_RG_ICA(
     This method consist of the following steps:
 
     1. Filter the channels with a FIR bandpass filter
-    2. Run a 2 component ICA on the red and green channel (when there is less blood under the skin, it has a more pale, yellowy hue, and yellow is mainly a mix of red and green)
+    2. Run a 3 component PCA on the signal
     3. Select the frequency with the highest magnitude
     """
     video_source = FileVideoSource(filepath=target_video_file)
@@ -81,20 +81,33 @@ def fir_filtered_RG_ICA(
         filt_mags[i][0] = 0
 
     """
-    ICA
+    PCA
     """
-    transformer = FastICA(n_components=2, whiten="unit-variance", max_iter=1000)
-    ica = transformer.fit_transform(np.swapaxes(np.array(filtered)[1:3], 0, 1))
+    n_comp = 3
+    transformer = PCA(n_components=n_comp)
+    pca = transformer.fit_transform(np.swapaxes(np.array(filtered), 0, 1))
 
-    ica_freqs = rfftfreq(ica.shape[0], T)
+    pca_freqs = rfftfreq(pca.shape[0], T)
 
-    ica_mags = [np.abs(rfft(ica[:, i])) for i in range(2)]
+    pca_mags = [np.abs(rfft(pca[:, i])) for i in range(n_comp)]
 
-    for i in range(2):
-        ica_mags[i][0] = 0
+    for i in range(n_comp):
+        pca_mags[i][0] = 0
 
-    selected_component = 0 if np.max(ica_mags[0]) > np.max(ica_mags[1]) else 1
-    result = ica_freqs[np.argmax(ica_mags[selected_component])]
+    selected_component = 0
+    if n_comp == 2:
+        selected_component = 0 if np.max(pca_mags[0]) > np.max(pca_mags[1]) else 1
+    elif n_comp == 3:
+        if np.max(pca_mags[0]) > np.max(pca_mags[1]) and np.max(pca_mags[0]) > np.max(pca_mags[2]):
+            selected_component = 0
+        elif np.max(pca_mags[1]) > np.max(pca_mags[2]):
+            selected_component = 1
+        else:
+            selected_component = 2
+    else:
+        raise Exception(f"Selected number of components ({n_comp} is not implemented.")
+
+    result = pca_freqs[np.argmax(pca_mags[selected_component])]
 
     """
     Plots
@@ -108,7 +121,7 @@ def fir_filtered_RG_ICA(
 
         # Signal
         fig_signal, axs_signal = plt.subplots(3, 4, constrained_layout=True)
-        fig_signal.suptitle(f"ICA: Signal plots for: {target_video_file}")
+        fig_signal.suptitle(f"PCA: Signal plots for: {target_video_file}")
         fig_signal.legend(lines, labels)
 
         for i in range(3):
@@ -136,25 +149,25 @@ def fir_filtered_RG_ICA(
             axs_signal[i, 3].axvline(x=result, color="magenta", linestyle="solid")
 
         # Components
-        fig_components, axs_components = plt.subplots(2, 2, constrained_layout=True)
-        fig_components.suptitle(f"ICA: Components plots for: {target_video_file}")
+        fig_components, axs_components = plt.subplots(n_comp, 2, constrained_layout=True)
+        fig_components.suptitle(f"PCA: Components plots for: {target_video_file}")
         fig_components.legend(lines, labels)
 
-        for i in range(2):
+        for i in range(n_comp):
             title = f"Component {i + 1}"
             if i == selected_component:
                 title += " - Selected"
 
             axs_components[i, 0].set_title(title)
-            axs_components[i, 0].plot(ica[:, i])
+            axs_components[i, 0].plot(pca[:, i])
 
-        for i in range(2):
+        for i in range(n_comp):
             title = f"Component {i + 1} FT"
             if i == selected_component:
                 title += " - Selected"
 
             axs_components[i, 1].set_title(title)
-            axs_components[i, 1].plot(ica_freqs, ica_mags[i])
+            axs_components[i, 1].plot(pca_freqs, pca_mags[i])
 
             if acc_hr is not None:
                 axs_components[i, 1].axvline(x=acc_hr, color="black", linestyle="dashed")
